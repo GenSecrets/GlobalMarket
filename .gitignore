@@ -56,7 +56,6 @@ target/
 *.tlb
 *.tli
 *.tlh
-*.tmp
 *.vspscc
 .builds
 *.dotCover
@@ -168,4 +167,3 @@ pip-log.txt
 *.iml
 
 .gradle
-build

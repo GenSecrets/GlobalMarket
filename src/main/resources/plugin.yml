@@ -1,5 +1,5 @@
-name: GlobalMarket
-main: com.survivorserver.GlobalMarket.Market
+name: globalMarket
+main: com.survivorserver.globalMarket.Market
 version: '@version@'
 commands:
     market:
