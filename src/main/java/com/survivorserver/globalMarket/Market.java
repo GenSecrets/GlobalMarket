@@ -285,17 +285,7 @@ public class Market extends JavaPlugin implements Listener {
     
     public int getMaxMail(final String player, final String world) {
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 return getConfig().getInt("limits." + k + ".max_mail");
             }
         }
@@ -312,20 +302,9 @@ public class Market extends JavaPlugin implements Listener {
         return getConfig().getInt("limits.default.max_mail");
     }
     
-    public double getCut(final double amount, final String playerName, final String world) {
+    public double getCut(final double amount, final String player, final String world) {
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer player = getServer().getOfflinePlayer(playerName);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, player, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 if(getConfig().isDouble("limits." + k + ".cut")) {
                     return new BigDecimal(amount * getConfig().getDouble("limits." + k + ".cut")).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                 } else {
@@ -395,17 +374,7 @@ public class Market extends JavaPlugin implements Listener {
     public double getMaxPrice(final String player, final String world, final ItemStack item) {
         String limitGroup = "default";
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 limitGroup = k;
             }
         }
@@ -450,7 +419,7 @@ public class Market extends JavaPlugin implements Listener {
             return getConfig().getInt("limits.default.queue_trade_time");
         }
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.playerHas(world, player, "globalmarket.limits." + k)) {
+            if(hasLimitsPermThread(player, world, k)) {
                 return getConfig().getInt("limits." + k + ".queue_trade_time");
             }
         }
@@ -472,17 +441,7 @@ public class Market extends JavaPlugin implements Listener {
         }
 
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 return getConfig().getInt("limits." + k + ".queue_mail_time");
             }
         }
@@ -511,17 +470,7 @@ public class Market extends JavaPlugin implements Listener {
             return getConfig().getInt("limits.default.max_listings");
         }
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 return getConfig().getInt("limits." + k + ".max_listings");
             }
         }
@@ -533,17 +482,7 @@ public class Market extends JavaPlugin implements Listener {
             return getConfig().getInt("limits.default.expire_time");
         }
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
-            final boolean[] hasPerms = {false};
-            Thread offlineTemp = new Thread(){
-                public void run(){
-                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                        hasPerms[0] = true;
-                    }
-                }
-            };
-            offlineTemp.start();
-            if(hasPerms[0]) {
+            if(hasLimitsPermThread(player, world, k)) {
                 return getConfig().getInt("limits." + k + ".expire_time");
             }
         }
@@ -901,5 +840,19 @@ public class Market extends JavaPlugin implements Listener {
                 || mat == Material.SPRUCE_WALL_SIGN
                 || mat == Material.WARPED_SIGN
                 || mat == Material.WARPED_WALL_SIGN;
+    }
+
+    public boolean hasLimitsPermThread(String player,  String world, String k){
+        OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+        final boolean[] hasPerms = {false};
+        Thread offlineTemp = new Thread(){
+            public void run(){
+                if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                    hasPerms[0] = true;
+                }
+            }
+        };
+        offlineTemp.start();
+        return hasPerms[0];
     }
 }
