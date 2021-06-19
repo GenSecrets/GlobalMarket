@@ -33,7 +33,7 @@ public class MailInterface extends IMenu {
         super();
         this.market = market;
         addDefaultButtons();
-        addFunctionButton(49, new IFunctionButton("SortToggle", null, Material.DIODE) {
+        addFunctionButton(49, new IFunctionButton("SortToggle", null, Material.REPEATER) {
             @Override
             public boolean showButton(InterfaceHandler handler, InterfaceViewer viewer, boolean hasPrevPage, boolean hasNextPage) {
                 return true;
@@ -214,7 +214,11 @@ public class MailInterface extends IMenu {
 
     @Override
     public void onInterfaceClose(InterfaceViewer viewer) {
-    	market.getConfigHandler().savePlayerConfig(viewer.getViewer());
+        YamlConfiguration playerConf = market.getConfigHandler().getPlayerConfig(viewer.getViewer());
+        if (!playerConf.isSet("mail.sort_method")) {
+            market.getConfigHandler().savePlayerConfig(viewer.getViewer());
+        }
+    	playerConf.set("mail.sort_method", viewer.getSort().toString());
     }
 
     @Override

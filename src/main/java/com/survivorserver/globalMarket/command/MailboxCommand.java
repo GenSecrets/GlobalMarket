@@ -48,13 +48,8 @@ public class MailboxCommand extends SubCommand {
     public boolean onCommand(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         Location location = null;
-        Block block = player.getTargetBlock((HashSet<Byte>) null, 6);
-        if (block.getType() == Material.CHEST
-                // Trapped chest
-                || block.getTypeId() == 146
-                || block.getType() == Material.SIGN
-                || block.getType() == Material.SIGN_POST
-                || block.getType() == Material.WALL_SIGN) {
+        Block block = player.getTargetBlock((HashSet<Material>) null, 6);
+        if (Market.getMarket().isChestOrSign(block.getType())) {
             location = block.getLocation();
         } else {
             player.sendMessage(ChatColor.RED + locale.get("aim_cursor_at_chest_or_sign"));

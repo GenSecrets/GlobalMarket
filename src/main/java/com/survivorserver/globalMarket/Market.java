@@ -3,7 +3,6 @@ package com.survivorserver.globalMarket;
 import com.survivorserver.globalMarket.chat.ChatComponent;
 import com.survivorserver.globalMarket.command.MarketCommand;
 import com.survivorserver.globalMarket.legacy.Importer;
-import com.survivorserver.globalMarket.lib.ItemIndex;
 import com.survivorserver.globalMarket.lib.PacketManager;
 import com.survivorserver.globalMarket.sql.AsyncDatabase;
 import com.survivorserver.globalMarket.sql.Database;
@@ -12,7 +11,6 @@ import com.survivorserver.globalMarket.tasks.CleanTask;
 import com.survivorserver.globalMarket.tasks.ExpireTask;
 import com.survivorserver.globalMarket.tasks.Queue;
 import com.survivorserver.globalMarket.ui.IHandler;
-import me.dasfaust.GlobalMarket.WrappedItemStack;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.*;
@@ -62,12 +60,13 @@ public class Market extends JavaPlugin implements Listener {
     private LocaleHandler locale;
     private Map<String, String> searching;
     private MarketCommand cmd;
+    private TabCompletion tab;
     private HistoryHandler history;
     private AsyncDatabase asyncDb;
     private MarketStorage storage;
     private Map<String, String[]> worldLinks;
     private PacketManager packet;
-    private ItemIndex items;
+    //private ItemIndex items;
     private ChatComponent chat;
     private boolean mcpcp;
     
@@ -80,7 +79,7 @@ public class Market extends JavaPlugin implements Listener {
         tasks = new ArrayList<>();
         market = this;
         reloadConfig();
-        getConfig().options().header("globalMarket config: " + getDescription().getVersion());
+        getConfig().options().header("GlobalMarket config: " + getDescription().getVersion());
         getConfig().addDefault("storage.type", StorageMethod.SQLITE.toString());
         getConfig().addDefault("storage.mysql_user", "root");
         getConfig().addDefault("storage.mysql_pass", "password");
@@ -128,7 +127,7 @@ public class Market extends JavaPlugin implements Listener {
         if(!langFile.exists()) {
             saveResource("en_US.lang", true);
         }
-        items = new ItemIndex(this);
+        //items = new ItemIndex(this);
         
         final RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
         if(economyProvider != null) {
@@ -167,7 +166,9 @@ public class Market extends JavaPlugin implements Listener {
         locale = new LocaleHandler(config);
         prefix = locale.get("cmd.prefix");
         cmd = new MarketCommand(this);
+        tab = new TabCompletion();
         getCommand("market").setExecutor(cmd);
+        getCommand("market").setTabCompleter(tab);
         asyncDb = new AsyncDatabase(this);
         storage = new MarketStorage(this, asyncDb);
         worldLinks = new HashMap<>();
@@ -177,7 +178,7 @@ public class Market extends JavaPlugin implements Listener {
     public void initializeStorage() {
         final Database db = config.createConnection();
         if(!db.connect()) {
-            log.severe("Couldn't connect to the configured database! globalMarket can't continue without a connection, please check your config and do /market reload or restart your server");
+            log.severe("Couldn't connect to the configured database! GlobalMarket can't continue without a connection, please check your config and do /market reload or restart your server");
             return;
         }
         storage.loadSchema(db);
@@ -222,9 +223,9 @@ public class Market extends JavaPlugin implements Listener {
         chat = new ChatComponent(this);
     }
     
-    public ItemIndex getItemIndex() {
-        return items;
-    }
+    //public ItemIndex getItemIndex() {
+    //    return items;
+    //}
     
     public ChatComponent getChat() {
         return chat;
@@ -301,9 +302,20 @@ public class Market extends JavaPlugin implements Listener {
         return getConfig().getInt("limits.default.max_mail");
     }
     
-    public double getCut(final double amount, final String player, final String world) {
+    public double getCut(final double amount, final String playerName, final String world) {
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.has(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer player = getServer().getOfflinePlayer(playerName);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, player, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+
+            if(hasPerms[0]) {
                 if(getConfig().isDouble("limits." + k + ".cut")) {
                     return new BigDecimal(amount * getConfig().getDouble("limits." + k + ".cut")).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
                 } else {
@@ -356,7 +368,7 @@ public class Market extends JavaPlugin implements Listener {
         if(getConfig().isSet(itemPath)) {
             hasPrice = true;
         } else {
-            itemPath = "limits." + limitGroup + ".max_item_prices." + item.getTypeId();
+            itemPath = "limits." + limitGroup + ".max_item_prices." + item.getType();
             if(getConfig().isSet(itemPath)) {
                 hasPrice = true;
             }
@@ -490,8 +502,8 @@ public class Market extends JavaPlugin implements Listener {
     @SuppressWarnings("deprecation")
     public boolean itemBlacklisted(final ItemStack item) {
         final boolean isWhitelist = getConfig().getBoolean("blacklist.as_whitelist");
-        if(getConfig().isSet("blacklist.item_id." + item.getTypeId())) {
-            final String path = "blacklist.item_id." + item.getTypeId();
+        if(getConfig().isSet("blacklist.item_id." + item.getType())) {
+            final String path = "blacklist.item_id." + item.getType();
             if(getConfig().isList(path)) {
                 if(getConfig().getIntegerList(path).contains((int) item.getDurability())) {
                     return !isWhitelist;
@@ -525,9 +537,9 @@ public class Market extends JavaPlugin implements Listener {
                 }
             }
             if(meta.hasEnchants()) {
-                final List<Integer> ebl = getConfig().getIntegerList("blacklist.enchant_id");
+                final List<String> ebl = getConfig().getStringList("blacklist.enchant_id");
                 for(final Entry<Enchantment, Integer> entry : meta.getEnchants().entrySet()) {
-                    if(ebl.contains(entry.getKey().getId())) {
+                    if(ebl.contains(entry.getKey().toString())) {
                         return !isWhitelist;
                     }
                 }
@@ -535,9 +547,19 @@ public class Market extends JavaPlugin implements Listener {
             if(meta.hasLore()) {
                 final List<String> lbl = getConfig().getStringList("blacklist.lore");
                 final List<String> lore = meta.getLore();
-                for(final String str : lbl) {
-                    if(lore.contains(str)) {
-                        return !isWhitelist;
+                if(getConfig().getBoolean("blacklist.use_partial_lore")){
+                    for(final String str : lbl) {
+                        for(final String line : lore) {
+                            if(line.contains(str)) {
+                                return !isWhitelist;
+                            }
+                        }
+                    }
+                }else {
+                    for(final String str : lbl) {
+                        if(lore.contains(str)) {
+                            return !isWhitelist;
+                        }
                     }
                 }
             }
@@ -562,10 +584,10 @@ public class Market extends JavaPlugin implements Listener {
     }
     
     public String getItemName(final ItemStack item) {
-        if(mcpcp && item instanceof WrappedItemStack) {
-            return ((WrappedItemStack) item).getItemName();
-        }
-        final String itemName = items.getItemName(item);
+        //if(mcpcp && item instanceof WrappedItemStack) {
+        //    return ((WrappedItemStack) item).getItemName();
+        //}
+        final String itemName = item.getType().name();
         if(item.getAmount() > 1) {
             return locale.get("friendly_item_name_with_amount", item.getAmount(), itemName);
         } else {
@@ -574,7 +596,7 @@ public class Market extends JavaPlugin implements Listener {
     }
     
     public String getItemNameSingle(final ItemStack item) {
-        return items.getItemName(item);
+        return item.getType().name();
     }
     
     public MarketCommand getCmd() {
@@ -705,12 +727,7 @@ public class Market extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(final PlayerInteractEvent event) {
         if(!event.isCancelled() && event.getClickedBlock() != null) {
-            if(event.getClickedBlock().getType() == Material.CHEST
-                    // Trapped chest
-                    || event.getClickedBlock().getTypeId() == 146
-                    || event.getClickedBlock().getType() == Material.SIGN
-                    || event.getClickedBlock().getType() == Material.SIGN_POST
-                    || event.getClickedBlock().getType() == Material.WALL_SIGN) {
+            if(isChestOrSign(event.getClickedBlock().getType())) {
                 final Player player = event.getPlayer();
                 final Location location = event.getClickedBlock().getLocation();
                 final String loc = locationToString(location);
@@ -728,9 +745,7 @@ public class Market extends JavaPlugin implements Listener {
                         return;
                     }
                     event.setCancelled(true);
-                    if(event.getClickedBlock().getType() == Material.SIGN
-                            || event.getClickedBlock().getType() == Material.SIGN_POST
-                            || event.getClickedBlock().getType() == Material.WALL_SIGN) {
+                    if(isSign(event.getClickedBlock().getType())) {
                         final Sign sign = (Sign) event.getClickedBlock().getState();
                         final String line = sign.getLine(3);
                         if(line != null && !line.isEmpty()) {
@@ -759,12 +774,7 @@ public class Market extends JavaPlugin implements Listener {
             return;
         }
         final Block block = event.getBlock();
-        if(block.getType() == Material.CHEST
-                // Trapped chest
-                || block.getTypeId() == 146
-                || block.getType() == Material.SIGN
-                || block.getType() == Material.SIGN_POST
-                || block.getType() == Material.WALL_SIGN) {
+        if(isChestOrSign(block.getType())) {
             final Location location = block.getLocation();
             final String loc = locationToString(location);
             if(getConfig().isSet("mailbox." + loc)) {
@@ -814,5 +824,31 @@ public class Market extends JavaPlugin implements Listener {
         if(packet != null) {
             packet.unregister();
         }
+    }
+
+    public boolean isChestOrSign(Material mat){
+        return mat == Material.CHEST
+                || mat == Material.TRAPPED_CHEST
+                || isSign(mat);
+
+    }
+
+    public boolean isSign(Material mat){
+        return mat == Material.ACACIA_SIGN
+                || mat == Material.ACACIA_WALL_SIGN
+                || mat == Material.BIRCH_SIGN
+                || mat == Material.BIRCH_WALL_SIGN
+                || mat == Material.CRIMSON_SIGN
+                || mat == Material.CRIMSON_WALL_SIGN
+                || mat == Material.DARK_OAK_SIGN
+                || mat == Material.DARK_OAK_WALL_SIGN
+                || mat == Material.JUNGLE_SIGN
+                || mat == Material.JUNGLE_WALL_SIGN
+                || mat == Material.OAK_SIGN
+                || mat == Material.OAK_WALL_SIGN
+                || mat == Material.SPRUCE_SIGN
+                || mat == Material.SPRUCE_WALL_SIGN
+                || mat == Material.WARPED_SIGN
+                || mat == Material.WARPED_WALL_SIGN;
     }
 }

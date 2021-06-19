@@ -7,6 +7,7 @@ import com.survivorserver.globalMarket.lib.SortMethod;
 import com.survivorserver.globalMarket.lib.cauldron.CauldronHelper;
 import com.survivorserver.globalMarket.sql.*;
 import com.survivorserver.globalMarket.ui.IMarketItem;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -734,7 +735,7 @@ public class MarketStorage {
             final ItemStack item = getItem(listing.getItemId(), listing.getAmount());
             final String itemName = market.getItemName(item);
             if (itemName.toLowerCase().contains(search.toLowerCase())
-                    || isItemId(search, item.getTypeId())
+                    || isItemId(search, item.getType())
                     || isInDisplayName(search.toLowerCase(), item)
                     || isInEnchants(search.toLowerCase(), item)
                     || isInLore(search.toLowerCase(), item)
@@ -838,20 +839,32 @@ public class MarketStorage {
     }
 
     public void storePayment(final ItemStack item, final String player, final String buyer, final double fullAmount, final double amount, final double cut, final String world) {
-        ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
+        ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
         BookMeta meta = (BookMeta) book.getItemMeta();
         if (meta == null) {
             meta = (BookMeta) market.getServer().getItemFactory().getItemMeta(book.getType());
         }
         meta.setDisplayName(market.getLocale().get("transaction_log.item_name"));
-        final String itemName = market.getItemName(item);
-        final String logStr = market.getLocale().get("transaction_log.title") + "\n\n" +
-                        market.getLocale().get("transaction_log.item_sold", itemName) + "\n\n" +
-                        market.getLocale().get("transaction_log.buyer", buyer) + "\n\n" +
-                        market.getLocale().get("transaction_log.sale_price", fullAmount) + "\n\n" +
-                        market.getLocale().get("transaction_log.market_cut", cut) +  "\n\n" +
-                        market.getLocale().get("transaction_log.amount_recieved", amount);
-        meta.setPages(logStr);
+        final String itemType = market.getItemName(item);
+        if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
+            final String itemName = item.getItemMeta().getDisplayName();
+            final String logStr = market.getLocale().get("transaction_log.title") + "\n\n" +
+                    market.getLocale().get("transaction_log.item_sold", itemName + ChatColor.RESET) + "\n\n" +
+                    market.getLocale().get("transaction_log.item_type", itemType) + "\n\n" +
+                    market.getLocale().get("transaction_log.buyer", buyer) + "\n\n" +
+                    market.getLocale().get("transaction_log.sale_price", fullAmount) + "\n\n" +
+                    market.getLocale().get("transaction_log.market_cut", cut) +  "\n\n" +
+                    market.getLocale().get("transaction_log.amount_received", amount);
+            meta.setPages(logStr);
+        } else {
+            final String logStr = market.getLocale().get("transaction_log.title") + "\n\n" +
+                    market.getLocale().get("transaction_log.item_type", itemType) + "\n\n" +
+                    market.getLocale().get("transaction_log.buyer", buyer) + "\n\n" +
+                    market.getLocale().get("transaction_log.sale_price", fullAmount) + "\n\n" +
+                    market.getLocale().get("transaction_log.market_cut", cut) +  "\n\n" +
+                    market.getLocale().get("transaction_log.amount_received", amount);
+            meta.setPages(logStr);
+        }
         book.setItemMeta(meta);
         if (market.mcpcpSupportEnabled()) {
             book = CauldronHelper.wrapItemStack(book);
@@ -924,8 +937,8 @@ public class MarketStorage {
     /*
      * Basic search method
      */
-    public boolean isItemId(final String search, final int typeId) {
-        return search.equalsIgnoreCase(Integer.toString(typeId));
+    public boolean isItemId(final String search, final Material type) {
+        return search.equalsIgnoreCase(type.name());
     }
 
     /*

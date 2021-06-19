@@ -87,7 +87,7 @@ public class ItemIndex {
                 return  (potionLang.length == 2 ? getLocalized(potionLang[1]) + " " : "") + getLocalized(potionLang[0]);
             }
         }
-        if (mat == Material.MONSTER_EGG) {
+        if (mat == Material.LEGACY_MONSTER_EGG) {
             if (monsterLangMap.containsKey(damage)) {
                 return getLocalized(materialLangMap.get(new MaterialData(mat))) + " " + getLocalized(monsterLangMap.get(damage));
             }
@@ -101,7 +101,7 @@ public class ItemIndex {
             return mat.name();
         }
         String name = getLocalized(materialLangMap.get(data));
-        if (mat == Material.SKULL_ITEM && damage == 3) {
+        if (mat == Material.LEGACY_SKULL_ITEM && damage == 3) {
             SkullMeta meta = (SkullMeta) item.getItemMeta();
             if (meta.hasOwner()) {
                 name = String.format(name, meta.getOwner());
@@ -241,7 +241,7 @@ public class ItemIndex {
         potionLangMap.put(16461, new String[] {"potion.waterBreathing.postfix", "potion.prefix.grenade"});
         potionLangMap.put(16462, new String[] {"potion.invisibility.postfix", "potion.prefix.grenade"});
 
-        materialLangMap.put(new MaterialData(m("APPLE")), "item.apple.name");
+        materialLangMap.put(new MaterialData(Material.APPLE), "item.apple.name");
         materialLangMap.put(new MaterialData(m("GOLDEN_APPLE")), "item.appleGold.name");
         materialLangMap.put(new MaterialData(m("ARROW")), "item.arrow.name");
         materialLangMap.put(new MaterialData(m("BED")), "item.bed.name");

@@ -45,7 +45,7 @@ public class MarketCore {
             if (response.type == ResponseType.NOT_IMPLEMENTED) {
                 market.log.severe(econ.getName() + " may not be compatible with globalMarket. It does not support the withdrawPlayer() function.");
             } else {
-                market.log.severe("Recieved failed economy response from " + econ.getName() + ": " + response.errorMessage);
+                market.log.severe("Received failed economy response from " + econ.getName() + ": " + response.errorMessage);
             }
             return false;
         }
@@ -56,7 +56,7 @@ public class MarketCore {
                 if (response.type == ResponseType.NOT_IMPLEMENTED) {
                     market.log.severe(econ.getName() + " may not be compatible with globalMarket. It does not support the depositPlayer() function.");
                 } else {
-                    market.log.severe("Recieved failed economy response from " + econ.getName() + ": " + response.errorMessage);
+                    market.log.severe("Received failed economy response from " + econ.getName() + ": " + response.errorMessage);
                 }
                 return false;
             }
@@ -68,7 +68,7 @@ public class MarketCore {
                     if (response.type == ResponseType.NOT_IMPLEMENTED) {
                         market.log.severe(econ.getName() + " may not be compatible with globalMarket. It does not support the depositPlayer() function.");
                     } else {
-                        market.log.severe("Recieved failed economy response from " + econ.getName() + ": " + response.errorMessage);
+                        market.log.severe("Received failed economy response from " + econ.getName() + ": " + response.errorMessage);
                     }
                     return false;
                 }
@@ -97,9 +97,12 @@ public class MarketCore {
         if (!isInfinite && removeListing) {
             storage.removeListing(listing.getId());
         }
-        final String itemName = market.getItemName(item);
+        String itemName = market.getItemName(item);
+        if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
+            itemName = item.getItemMeta().getDisplayName();
+        }
         market.notifyPlayer(seller, market.autoPayment() ? market.getLocale().get("you_sold_your_listing", itemName) :
-            market.getLocale().get("listing_purchased_mailbox", itemName));
+            market.getLocale().get("listing_purchased_mailbox", (itemName + "" + ChatColor.RESET)));
         market.notifyPlayer(buyer, market.getLocale().get("you_have_new_mail"));
         // Update viewers
         if (refreshInterface) {
@@ -167,9 +170,12 @@ public class MarketCore {
         if (!isInfinite && removeListing) {
             storage.removeListing(listing.getId());
         }
-        final String itemName = market.getItemName(item);
+        String itemName = market.getItemName(item);
+        if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
+            itemName = item.getItemMeta().getDisplayName();
+        }
         market.notifyPlayer(seller, market.autoPayment() ? market.getLocale().get("you_sold_your_listing_of", itemName) :
-            market.getLocale().get("listing_purchased_mailbox", itemName));
+            market.getLocale().get("listing_purchased_mailbox", (itemName + "" + ChatColor.RESET)));
         market.notifyPlayer(buyer, market.getLocale().get("you_have_new_mail"));
         // Update viewers
         if (refreshInterface) {

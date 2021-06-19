@@ -108,7 +108,7 @@ public class LegacyMarketStorage {
             String itemName = market.getItemName(item);
             String seller = listing.getSeller();
             if (itemName.toLowerCase().contains(search.toLowerCase())
-                    || isItemId(search, item.getTypeId())
+                    || isItemId(search, item.getType())
                     || isInDisplayName(search.toLowerCase(), item)
                     || isInEnchants(search.toLowerCase(), item)
                     || isInLore(search.toLowerCase(), item)
@@ -336,8 +336,8 @@ public class LegacyMarketStorage {
         config.getQueueYML().set("queue." + id, null);
     }
 
-    public boolean isItemId(String search, int typeId) {
-        if (search.equalsIgnoreCase(Integer.toString(typeId))) {
+    public boolean isItemId(String search, Material typeId) {
+        if (search.equalsIgnoreCase(typeId.name())) {
             return true;
         }
         return false;

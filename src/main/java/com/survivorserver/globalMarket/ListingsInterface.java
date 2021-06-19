@@ -34,7 +34,7 @@ public class ListingsInterface extends IMenu {
     public ListingsInterface(final Market market) {
         this.market = market;
         addDefaultButtons();
-        addFunctionButton(49, new IFunctionButton("SortToggle", null, Material.REDSTONE_COMPARATOR) {
+        addFunctionButton(49, new IFunctionButton("SortToggle", null, Material.COMPARATOR) {
             @Override
             public boolean showButton(final InterfaceHandler handler, final InterfaceViewer viewer, final boolean hasPrevPage, final boolean hasNextPage) {
                 return true;
@@ -66,6 +66,7 @@ public class ListingsInterface extends IMenu {
                 handler.refreshViewer(viewer, viewer.getInterface().getName());
             }
         });
+
         addFunctionButton(46, new IFunctionButton("PLibCreate", null, Material.HOPPER) {
             @Override
             public boolean showButton(final InterfaceHandler handler, final InterfaceViewer viewer, final boolean hasPrevPage, final boolean hasNextPage) {
@@ -116,7 +117,8 @@ public class ListingsInterface extends IMenu {
                 }
             }
         });
-        addFunctionButton(47, new IFunctionButton("Search", null, Material.EMPTY_MAP) {
+
+        /*addFunctionButton(47, new IFunctionButton("Search", null, Material.MAP) {
             @Override
             public void onClick(final Player player, final InterfaceHandler handler, final InterfaceViewer viewer, final int slot, final InventoryClickEvent event) {
                 if(viewer.getSearch() == null) {
@@ -145,7 +147,7 @@ public class ListingsInterface extends IMenu {
             public boolean showButton(final InterfaceHandler handler, final InterfaceViewer viewer, final boolean hasPrevPage, final boolean hasNextPage) {
                 return true;
             }
-        });
+        });*/
     }
     
     private static void create(final Player player, final ItemStack item, final InterfaceViewer viewer) {
@@ -411,14 +413,14 @@ public class ListingsInterface extends IMenu {
         }
         
         final int siblings = listing.countStacked();
-        if(siblings > 0) {
+        if(siblings > 1) {
             int count = 0;
             if(siblings <= 15) {
                 for(final Listing l : listing.getStacked()) {
                     count += l.getAmount();
                 }
             }
-            lore.add(ChatColor.AQUA + market.getLocale().get("interface.stacked", listing.getAmount(), count > 0 ? count + listing.getAmount() : market.getLocale().get("interface.stacked_many")));
+            lore.add(ChatColor.AQUA + market.getLocale().get("interface.stacked", listing.getAmount(), (count > 0 ? count + listing.getAmount() : market.getLocale().get("interface.stacked_many"))));
         }
         
         meta.setLore(lore);
@@ -429,7 +431,7 @@ public class ListingsInterface extends IMenu {
     @Override
     public void handleLeftClickAction(final InterfaceViewer viewer, final IMarketItem item, final InventoryClickEvent event) {
         if(market.getCore().buyListing((Listing) item, (Player) event.getWhoClicked(), viewer, true, true, true)) {
-            event.getWhoClicked().sendMessage("" + item);
+            //event.getWhoClicked().sendMessage("HANDLE LEFT CLICK ACTION " + item);
             viewer.resetActions();
         }
     }
@@ -437,7 +439,7 @@ public class ListingsInterface extends IMenu {
     @Override
     public void handleShiftClickAction(final InterfaceViewer viewer, final IMarketItem item, final InventoryClickEvent event) {
         viewer.resetActions();
-        event.getWhoClicked().sendMessage("" + item);
+        //event.getWhoClicked().sendMessage("HANDLE SHIFT LEFT CLICK ACTION " + item);
         market.getCore().removeListing((Listing) item, (Player) event.getWhoClicked());
     }
     
@@ -466,7 +468,11 @@ public class ListingsInterface extends IMenu {
     
     @Override
     public void onInterfaceClose(final InterfaceViewer viewer) {
-        market.getConfigHandler().savePlayerConfig(viewer.getViewer());
+        YamlConfiguration playerConf = market.getConfigHandler().getPlayerConfig(viewer.getViewer());
+        if (!playerConf.isSet("listings.sort_method")) {
+            market.getConfigHandler().savePlayerConfig(viewer.getViewer());
+        }
+        playerConf.set("listings.sort_method", viewer.getSort().toString());
     }
     
     @Override

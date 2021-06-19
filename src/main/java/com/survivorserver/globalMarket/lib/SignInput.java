@@ -52,7 +52,7 @@ public class SignInput {
             // Set
             PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_CHANGE);
             packet.getIntegers().write(0, x).write(1, y).write(2, z).write(3, 0);
-            packet.getBlocks().write(0, Material.SIGN_POST);
+            packet.getBlocks().write(0, Material.OAK_WALL_SIGN);
             manager.sendServerPacket(player, packet);
 
             // Update
