@@ -1,0 +1,57 @@
+# GlobalMarket config: 2.0
+storage:
+  type: sqlite
+  mysql_user: root
+  mysql_pass: password
+  mysql_database: market
+  mysql_address: localhost
+  mysql_port: 3306
+multiworld:
+  enable: false
+  links: &id001 []
+limits:
+  default:
+    cut: 0.05
+    max_price: 0.0
+    max_item_prices:
+      air:
+        dmg: 0
+        price: 50.0
+    creation_fee: 0.05
+    max_listings: 0
+    expire_time: 0
+    queue_trade_time: 0
+    queue_mail_time: 0
+    allow_creative: true
+    max_mail: 0
+queue:
+  queue_mail_on_buy: true
+  queue_on_cancel: true
+infinite:
+  seller: Server
+  account: ''
+blacklist:
+  as_whitelist: false
+  custom_names: false
+  item_name:
+    - Transaction Log
+    - Market History
+  item_id:
+    '0': 0
+  enchant_id: *id001
+  use_partial_lore: true
+  lore:
+    - §Test
+  use_with_mail: false
+automatic_payments: false
+enable_history: true
+announce_new_listings: true
+stall_radius: 0
+mailbox_radius: 0
+new_mail_notification: true
+new_mail_notification_delay: 10
+enable_metrics: true
+notify_on_update: true
+language_file: en_US.lang
+mailbox: []
+stall: []

@@ -1,4 +1,4 @@
-version: '@version@'
+version: '2.0'
 selected: english
 english:
     you_have_new_mail: "You have new mail!"
@@ -9,8 +9,8 @@ english:
         help_legend: "Legend: () optional, [] description"
         listings_syntax: "/market listings (<search>)"
         listings_descr: "[Shows listings]"
-        cs_syntax: "/market cancelSearch <search>"
-        cs_descr: "[Cancels all listings with the given criteria]"
+        cs_syntax: "/market cancelAll <criteria>"
+        cs_descr: "[Cancels all listings with the given criteria ... be specific!]"
         create_syntax: "/market create <price> (<amount>)"
         create_descr: "[Creates a listing]"
         mailbox_syntax: "/market mailbox (remove)"
@@ -57,9 +57,10 @@ english:
         item_name: "Transaction Log"
         title: "Market Transaction Log"
         item_sold: "Item sold: %s"
+        item_type: "Item type: %s"
         sale_price: "Sale price: %s"
         market_cut: "Market cut: %s"
-        amount_recieved: "Amount received: %s"
+        amount_received: "Amount received: %s"
         buyer: "Buyer: %s"
         unsignable: "Unsignable"
     listing_purchased_mailbox: "Your listing of %s has been purchased, pick up your earnings at a mailbox"
