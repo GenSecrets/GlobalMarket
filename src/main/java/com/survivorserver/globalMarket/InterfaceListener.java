@@ -4,6 +4,7 @@ import com.survivorserver.globalMarket.ui.IMarketItem;
 import com.survivorserver.globalMarket.ui.IMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -41,7 +42,7 @@ public class InterfaceListener implements Listener {
         final int slot = event.getSlot();
 
         final int lastTopSlot = event.getInventory().getSize() < 54 ? 26 : 53;
-        if (viewer != null && event.getInventory().getName().equalsIgnoreCase(viewer.getGui().getName())) {
+        if (viewer != null && event.getView().getTitle().equalsIgnoreCase(viewer.getInterface().getTitle())) {
             if (viewer.getGui() != null) {
                 if (rawSlot <= lastTopSlot && slot > -1) {
                     // Determine if a click was within the top portion of the inventory
@@ -170,7 +171,7 @@ public class InterfaceListener implements Listener {
     @EventHandler
     public void handleDrag(final InventoryDragEvent event) {
         final InterfaceViewer viewer = handler.findViewer(event.getWhoClicked().getName());
-        if (viewer != null && event.getInventory().getName().equalsIgnoreCase(viewer.getGui().getName())) {
+        if (event.getView().getTitle().equalsIgnoreCase(viewer.getInterface().getTitle())) {
             final int lastTopSlot = event.getInventory().getSize() < 54 ? 26 : 53;
             event.getRawSlots().stream().filter(raw -> raw <= lastTopSlot).forEach(raw -> event.setCancelled(true));
         } else if (isMarketItem(event.getCursor())) {
