@@ -285,7 +285,17 @@ public class Market extends JavaPlugin implements Listener {
     
     public int getMaxMail(final String player, final String world) {
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.has(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+            if(hasPerms[0]) {
                 return getConfig().getInt("limits." + k + ".max_mail");
             }
         }
@@ -385,7 +395,17 @@ public class Market extends JavaPlugin implements Listener {
     public double getMaxPrice(final String player, final String world, final ItemStack item) {
         String limitGroup = "default";
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.playerHas(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+            if(hasPerms[0]) {
                 limitGroup = k;
             }
         }
@@ -450,8 +470,19 @@ public class Market extends JavaPlugin implements Listener {
         if(perms == null) {
             return getConfig().getInt("limits.default.queue_mail_time");
         }
+
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.playerHas(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+            if(hasPerms[0]) {
                 return getConfig().getInt("limits." + k + ".queue_mail_time");
             }
         }
@@ -480,7 +511,17 @@ public class Market extends JavaPlugin implements Listener {
             return getConfig().getInt("limits.default.max_listings");
         }
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.playerHas(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+            if(hasPerms[0]) {
                 return getConfig().getInt("limits." + k + ".max_listings");
             }
         }
@@ -492,7 +533,17 @@ public class Market extends JavaPlugin implements Listener {
             return getConfig().getInt("limits.default.expire_time");
         }
         for(final String k : getConfig().getConfigurationSection("limits").getKeys(false)) {
-            if(perms.playerHas(world, player, "globalmarket.limits." + k)) {
+            OfflinePlayer playerOff = getServer().getOfflinePlayer(player);
+            final boolean[] hasPerms = {false};
+            Thread offlineTemp = new Thread(){
+                public void run(){
+                    if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
+                        hasPerms[0] = true;
+                    }
+                }
+            };
+            offlineTemp.start();
+            if(hasPerms[0]) {
                 return getConfig().getInt("limits." + k + ".expire_time");
             }
         }
