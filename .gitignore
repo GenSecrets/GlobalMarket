@@ -167,3 +167,6 @@ pip-log.txt
 *.iml
 
 .gradle
+*.db
+*.jar
+gradle/
