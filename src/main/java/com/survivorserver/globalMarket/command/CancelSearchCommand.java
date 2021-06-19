@@ -24,7 +24,7 @@ public class CancelSearchCommand extends SubCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[] {"canceall"};
+        return new String[] {"cancelall"};
     }
 
     @Override
