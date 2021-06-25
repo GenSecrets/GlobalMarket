@@ -7,6 +7,7 @@ import com.survivorserver.globalMarket.lib.SortMethod;
 import com.survivorserver.globalMarket.lib.cauldron.CauldronHelper;
 import com.survivorserver.globalMarket.sql.*;
 import com.survivorserver.globalMarket.ui.IMarketItem;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -850,7 +851,7 @@ public class MarketStorage {
             final String itemName = item.getItemMeta().getDisplayName();
             final String logStr = market.getLocale().get("transaction_log.title") + "\n\n" +
                     market.getLocale().get("transaction_log.item_sold", itemName + ChatColor.RESET) + "\n\n" +
-                    market.getLocale().get("transaction_log.item_type", itemType) + "\n\n" +
+                    market.getLocale().get("transaction_log.item_type",  WordUtils.capitalize((item.getType().name().toLowerCase()).replace("_", " "))) + "\n\n" +
                     market.getLocale().get("transaction_log.buyer", buyer) + "\n\n" +
                     market.getLocale().get("transaction_log.sale_price", fullAmount) + "\n\n" +
                     market.getLocale().get("transaction_log.market_cut", cut) +  "\n\n" +
@@ -858,7 +859,7 @@ public class MarketStorage {
             meta.setPages(logStr);
         } else {
             final String logStr = market.getLocale().get("transaction_log.title") + "\n\n" +
-                    market.getLocale().get("transaction_log.item_type", itemType) + "\n\n" +
+                    market.getLocale().get("transaction_log.item_type", WordUtils.capitalize((item.getType().name().toLowerCase()).replace("_", " "))) + "\n\n" +
                     market.getLocale().get("transaction_log.buyer", buyer) + "\n\n" +
                     market.getLocale().get("transaction_log.sale_price", fullAmount) + "\n\n" +
                     market.getLocale().get("transaction_log.market_cut", cut) +  "\n\n" +
