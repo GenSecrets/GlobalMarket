@@ -5,6 +5,7 @@ import com.survivorserver.globalMarket.lib.cauldron.CauldronHelper;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -100,6 +101,8 @@ public class MarketCore {
         String itemName = market.getItemName(item);
         if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
             itemName = item.getItemMeta().getDisplayName();
+        } else {
+            itemName = WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
         }
         market.notifyPlayer(seller, market.autoPayment() ? market.getLocale().get("you_sold_your_listing", itemName) :
             market.getLocale().get("listing_purchased_mailbox", (itemName + "" + ChatColor.RESET)));
@@ -173,6 +176,8 @@ public class MarketCore {
         String itemName = market.getItemName(item);
         if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
             itemName = item.getItemMeta().getDisplayName();
+        } else {
+            itemName = WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
         }
         market.notifyPlayer(seller, market.autoPayment() ? market.getLocale().get("you_sold_your_listing_of", itemName) :
             market.getLocale().get("listing_purchased_mailbox", (itemName + "" + ChatColor.RESET)));
