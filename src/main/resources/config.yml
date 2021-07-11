@@ -8,7 +8,7 @@ storage:
   mysql_port: 3306
 multiworld:
   enable: false
-  links: &id001 []
+  links: []
 limits:
   default:
     cut: 0.05
@@ -38,11 +38,17 @@ blacklist:
     - Market History
   item_id:
     '0': 0
-  enchant_id: *id001
+    GOLD_BLOCK: 0
+    GOLD_INGOT: 0
+    GOLD_NUGGET: 0
+  enchant_id:
+    - BruhWhut
   use_partial_lore: true
+  use_with_mail: true
   lore:
-    - §Test
-  use_with_mail: false
+    - Soulbound
+    - Bind on Pickup
+    - Bind On Pickup
 automatic_payments: false
 enable_history: true
 announce_new_listings: true
