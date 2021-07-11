@@ -79,7 +79,7 @@ public class Market extends JavaPlugin implements Listener {
         tasks = new ArrayList<>();
         market = this;
         reloadConfig();
-        getConfig().options().header("GlobalMarket config: " + getDescription().getVersion());
+        /*getConfig().options().header("GlobalMarket config: " + getDescription().getVersion());
         getConfig().addDefault("storage.type", StorageMethod.SQLITE.toString());
         getConfig().addDefault("storage.mysql_user", "root");
         getConfig().addDefault("storage.mysql_pass", "password");
@@ -121,7 +121,7 @@ public class Market extends JavaPlugin implements Listener {
         getConfig().addDefault("notify_on_update", true);
         
         getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveConfig();*/
         
         final File langFile = new File(getDataFolder().getAbsolutePath() + File.separator + "en_US.lang");
         if(!langFile.exists()) {
@@ -613,7 +613,8 @@ public class Market extends JavaPlugin implements Listener {
             final Set<String> linkList = section.getKeys(false);
             for(final World wor : getServer().getWorlds()) {
                 final String world = wor.getName();
-                links.put(world, linkList.contains(world) ? getConfig().getStringList("multiworld.links." + world) : new ArrayList<>());
+                links.put(world, linkList.contains(world) ?
+                        getConfig().getStringList("multiworld.links." + world) : new ArrayList<>());
                 linkList.stream().filter(w -> !w.equalsIgnoreCase(world))
                         .filter(w -> getConfig().getStringList("multiworld.links." + w).contains(world))
                         .filter(w -> !links.get(world).contains(w)).forEach(w -> links.get(world).add(w));
@@ -848,7 +849,7 @@ public class Market extends JavaPlugin implements Listener {
         Thread offlineTemp = new Thread(){
             public void run(){
                 if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                    hasPerms[0] = true;
+                    hasPerms[0] = true
                 }
             }
         };
