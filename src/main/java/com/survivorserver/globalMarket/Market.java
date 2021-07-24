@@ -78,50 +78,7 @@ public class Market extends JavaPlugin implements Listener {
         log = getLogger();
         tasks = new ArrayList<>();
         market = this;
-        reloadConfig();
-        /*getConfig().options().header("GlobalMarket config: " + getDescription().getVersion());
-        getConfig().addDefault("storage.type", StorageMethod.SQLITE.toString());
-        getConfig().addDefault("storage.mysql_user", "root");
-        getConfig().addDefault("storage.mysql_pass", "password");
-        getConfig().addDefault("storage.mysql_database", "market");
-        getConfig().addDefault("storage.mysql_address", "localhost");
-        getConfig().addDefault("storage.mysql_port", 3306);
-        getConfig().addDefault("multiworld.enable", false);
-        getConfig().addDefault("multiworld.links", Collections.emptyList());
-        getConfig().addDefault("limits.default.cut", 0.05);
-        getConfig().addDefault("limits.default.max_price", 0.0);
-        getConfig().addDefault("limits.default.max_item_prices.air.dmg", 0);
-        getConfig().addDefault("limits.default.max_item_prices.air.price", 50.0);
-        getConfig().addDefault("limits.default.creation_fee", 0.05);
-        getConfig().addDefault("limits.default.max_listings", 0);
-        getConfig().addDefault("limits.default.expire_time", 0);
-        getConfig().addDefault("limits.default.queue_trade_time", 0);
-        getConfig().addDefault("limits.default.queue_mail_time", 0);
-        getConfig().addDefault("limits.default.allow_creative", true);
-        getConfig().addDefault("limits.default.max_mail", 0);
-        getConfig().addDefault("queue.queue_mail_on_buy", true);
-        getConfig().addDefault("queue.queue_on_cancel", true);
-        getConfig().addDefault("infinite.seller", "Server");
-        getConfig().addDefault("infinite.account", "");
-        getConfig().addDefault("blacklist.as_whitelist", false);
-        getConfig().addDefault("blacklist.custom_names", false);
-        getConfig().addDefault("blacklist.item_name", Arrays.asList("Transaction Log", "Market History"));
-        getConfig().addDefault("blacklist.item_id.0", 0);
-        getConfig().addDefault("blacklist.enchant_id", Collections.emptyList());
-        getConfig().addDefault("blacklist.lore", Collections.emptyList());
-        getConfig().addDefault("blacklist.use_with_mail", false);
-        getConfig().addDefault("automatic_payments", false);
-        getConfig().addDefault("enable_history", true);
-        getConfig().addDefault("announce_new_listings", true);
-        getConfig().addDefault("stall_radius", 0);
-        getConfig().addDefault("mailbox_radius", 0);
-        getConfig().addDefault("new_mail_notification", true);
-        getConfig().addDefault("new_mail_notification_delay", 10);
-        getConfig().addDefault("enable_metrics", true);
-        getConfig().addDefault("notify_on_update", true);
-        
-        getConfig().options().copyDefaults(true);
-        saveConfig();*/
+        setupConfigs();
         
         final File langFile = new File(getDataFolder().getAbsolutePath() + File.separator + "en_US.lang");
         if(!langFile.exists()) {
@@ -222,10 +179,6 @@ public class Market extends JavaPlugin implements Listener {
         }
         chat = new ChatComponent(this);
     }
-    
-    //public ItemIndex getItemIndex() {
-    //    return items;
-    //}
     
     public ChatComponent getChat() {
         return chat;
@@ -613,8 +566,7 @@ public class Market extends JavaPlugin implements Listener {
             final Set<String> linkList = section.getKeys(false);
             for(final World wor : getServer().getWorlds()) {
                 final String world = wor.getName();
-                links.put(world, linkList.contains(world) ?
-                        getConfig().getStringList("multiworld.links." + world) : new ArrayList<>());
+                links.put(world, linkList.contains(world) ? getConfig().getStringList("multiworld.links." + world) : new ArrayList<>());
                 linkList.stream().filter(w -> !w.equalsIgnoreCase(world))
                         .filter(w -> getConfig().getStringList("multiworld.links." + w).contains(world))
                         .filter(w -> !links.get(world).contains(w)).forEach(w -> links.get(world).add(w));
@@ -849,11 +801,64 @@ public class Market extends JavaPlugin implements Listener {
         Thread offlineTemp = new Thread(){
             public void run(){
                 if(perms.playerHas(world, playerOff, "globalmarket.limits." + k)){
-                    hasPerms[0] = true
+                    hasPerms[0] = true;
                 }
             }
         };
         offlineTemp.start();
         return hasPerms[0];
+    }
+
+    public void reloadConfigs(){
+        reloadConfig();
+    }
+
+    public void setupConfigs(){
+        getConfig().options().header("GlobalMarket config: " + getDescription().getVersion());
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        setupConfigDefaults();
+    }
+
+    public void setupConfigDefaults(){
+        getConfig().addDefault("storage.type", StorageMethod.SQLITE.toString());
+        getConfig().addDefault("storage.mysql_user", "root");
+        getConfig().addDefault("storage.mysql_pass", "password");
+        getConfig().addDefault("storage.mysql_database", "market");
+        getConfig().addDefault("storage.mysql_address", "localhost");
+        getConfig().addDefault("storage.mysql_port", 3306);
+        getConfig().addDefault("multiworld.enable", false);
+        getConfig().addDefault("multiworld.links", Collections.emptyList());
+        getConfig().addDefault("limits.default.cut", 0.05);
+        getConfig().addDefault("limits.default.max_price", 0.0);
+        getConfig().addDefault("limits.default.max_item_prices.air.dmg", 0);
+        getConfig().addDefault("limits.default.max_item_prices.air.price", 50.0);
+        getConfig().addDefault("limits.default.creation_fee", 0.05);
+        getConfig().addDefault("limits.default.max_listings", 0);
+        getConfig().addDefault("limits.default.expire_time", 0);
+        getConfig().addDefault("limits.default.queue_trade_time", 0);
+        getConfig().addDefault("limits.default.queue_mail_time", 0);
+        getConfig().addDefault("limits.default.allow_creative", true);
+        getConfig().addDefault("limits.default.max_mail", 0);
+        getConfig().addDefault("queue.queue_mail_on_buy", true);
+        getConfig().addDefault("queue.queue_on_cancel", true);
+        getConfig().addDefault("infinite.seller", "Server");
+        getConfig().addDefault("infinite.account", "");
+        getConfig().addDefault("blacklist.as_whitelist", false);
+        getConfig().addDefault("blacklist.custom_names", false);
+        getConfig().addDefault("blacklist.item_name", Arrays.asList("Transaction Log", "Market History"));
+        getConfig().addDefault("blacklist.item_id.0", 0);
+        getConfig().addDefault("blacklist.enchant_id", Collections.emptyList());
+        getConfig().addDefault("blacklist.lore", Collections.emptyList());
+        getConfig().addDefault("blacklist.use_with_mail", false);
+        getConfig().addDefault("automatic_payments", false);
+        getConfig().addDefault("enable_history", true);
+        getConfig().addDefault("announce_new_listings", true);
+        getConfig().addDefault("stall_radius", 0);
+        getConfig().addDefault("mailbox_radius", 0);
+        getConfig().addDefault("new_mail_notification", true);
+        getConfig().addDefault("new_mail_notification_delay", 10);
+        getConfig().addDefault("enable_metrics", true);
+        getConfig().addDefault("notify_on_update", true);
     }
 }
