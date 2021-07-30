@@ -171,6 +171,9 @@ public class InterfaceListener implements Listener {
     @EventHandler
     public void handleDrag(final InventoryDragEvent event) {
         final InterfaceViewer viewer = handler.findViewer(event.getWhoClicked().getName());
+        if(viewer.getInterface() == null){
+            return;
+        }
         if (event.getView().getTitle().equalsIgnoreCase(viewer.getInterface().getTitle())) {
             final int lastTopSlot = event.getInventory().getSize() < 54 ? 26 : 53;
             event.getRawSlots().stream().filter(raw -> raw <= lastTopSlot).forEach(raw -> event.setCancelled(true));
