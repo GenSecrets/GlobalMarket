@@ -171,7 +171,7 @@ public class InterfaceListener implements Listener {
     @EventHandler
     public void handleDrag(final InventoryDragEvent event) {
         final InterfaceViewer viewer = handler.findViewer(event.getWhoClicked().getName());
-        if(viewer.getInterface() == null){
+        if(viewer == null || viewer.getInterface() == null){
             return;
         }
         if (event.getView().getTitle().equalsIgnoreCase(viewer.getInterface().getTitle())) {
