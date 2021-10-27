@@ -650,7 +650,7 @@ public class Market extends JavaPlugin implements Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(final AsyncPlayerChatEvent event) {
         final Player player = event.getPlayer();
         if(searching.containsKey(player.getName())) {
@@ -667,7 +667,7 @@ public class Market extends JavaPlugin implements Listener {
     }
     
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onRightClick(final PlayerInteractEvent event) {
         if(!event.isCancelled() && event.getClickedBlock() != null) {
             if(isChestOrSign(event.getClickedBlock().getType())) {
@@ -711,7 +711,7 @@ public class Market extends JavaPlugin implements Listener {
     }
     
     @SuppressWarnings("deprecation")
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
         if(event.isCancelled()) {
             return;
