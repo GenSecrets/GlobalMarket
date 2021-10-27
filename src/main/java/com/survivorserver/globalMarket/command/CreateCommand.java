@@ -19,19 +19,38 @@ import com.survivorserver.globalMarket.LocaleHandler;
 import com.survivorserver.globalMarket.Market;
 import com.survivorserver.globalMarket.MarketStorage;
 
-public class CreateCommand {
-    private final Market market;
-    private final LocaleHandler locale;
+public class CreateCommand extends SubCommand {
 
     public CreateCommand(Market market, LocaleHandler locale) {
-        this.market = market;
-        this.locale = locale;
+        super(market, locale);
     }
 
+    @Override
+    public String getCommand() {
+        return "create";
+    }
+
+    @Override
+    public String[] getAliases() {
+        return new String[] {"list", "sell", "add"};
+    }
+
+    @Override
+    public String getPermissionNode() {
+        return "globalmarket.create";
+    }
+
+    @Override
     public String getHelp() {
         return locale.get("cmd.prefix") + locale.get("cmd.create_syntax") + " " + locale.get("cmd.create_descr");
     }
 
+    @Override
+    public boolean allowConsoleSender() {
+        return false;
+    }
+
+    @Override
     public boolean onCommand(CommandSender sender, String[] args) {
         String prefix = locale.get("cmd.prefix");
         MarketStorage storage = market.getStorage();
@@ -62,16 +81,16 @@ public class CreateCommand {
                 return true;
             }
         }
-        if (player.getItemInHand() != null && player.getItemInHand().getType() != Material.AIR && args.length >= 1) {
+        if (player.getItemInHand() != null && player.getItemInHand().getType() != Material.AIR && args.length >= 2) {
             if (player.getGameMode() == GameMode.CREATIVE && !market.allowCreative(player)) {
                 player.sendMessage(ChatColor.RED + locale.get("not_allowed_while_in_creative"));
                 return true;
             }
             double price = 0;
             try {
-                price = Double.parseDouble(args[0]);
+                price = Double.parseDouble(args[1]);
             } catch(Exception e) {
-                player.sendMessage(ChatColor.RED + locale.get("not_a_valid_number", args[0]));
+                player.sendMessage(ChatColor.RED + locale.get("not_a_valid_number", args[1]));
                 return true;
             }
             List<String> extraArgs = new ArrayList<String>();
@@ -100,15 +119,15 @@ public class CreateCommand {
             }
             int amount = 0;
             double fee = market.getCreationFee(player, price);
-            if ((args.length == 2 && extraArgs.isEmpty()) || (args.length == 3 && !extraArgs.isEmpty())) {
+            if ((args.length == 3 && extraArgs.isEmpty()) || (args.length == 4 && !extraArgs.isEmpty())) {
                 try {
-                    amount = Integer.parseInt(args[1]);
+                    amount = Integer.parseInt(args[2]);
                 } catch(Exception e) {
-                    player.sendMessage(ChatColor.RED + locale.get("not_a_valid_number", args[1]));
+                    player.sendMessage(ChatColor.RED + locale.get("not_a_valid_number", args[2]));
                     return true;
                 }
                 if (amount <= 0) {
-                    player.sendMessage(ChatColor.RED + locale.get("not_a_valid_amount", args[1]));
+                    player.sendMessage(ChatColor.RED + locale.get("not_a_valid_amount", args[2]));
                     return true;
                 }
                 if (!infinite && player.getItemInHand().getAmount() < amount) {
