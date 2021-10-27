@@ -9,6 +9,7 @@ import com.survivorserver.globalMarket.ui.IHandler;
 import com.survivorserver.globalMarket.ui.IMarketItem;
 import com.survivorserver.globalMarket.ui.IMenu;
 import com.survivorserver.globalMarket.lib.cauldron.CauldronHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -154,7 +155,9 @@ public class InterfaceHandler {
     }
 
     public void openGui(InterfaceViewer viewer) {
-        market.getServer().getPlayer(viewer.getViewer()).openInventory(viewer.getGui());
+        Bukkit.getScheduler().runTask(market, () ->
+                market.getServer().getPlayer(viewer.getViewer()).openInventory(viewer.getGui())
+        );
     }
 
     public void openInterface(Player player, String search, String marketInterface) {
