@@ -4,55 +4,59 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TabCompletion implements TabCompleter {
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(strings.length == 1){
-            return new ArrayList<String>(){{
-                add("listings");
-                add("cancelall");
-                add("mail");
-                add("create");
-                add("send");
-                add("pricecheck");
-                add("mailbox");
-                add("stall");
-                add("history");
-                add("reload");}};
-        } else {
-            ArrayList<String> numbers = new ArrayList<>();
-            ArrayList<String> players = new ArrayList<>();
-            for (int i = 1; i <= 5; i++){
-                numbers.add(String.valueOf(i));
-            }
-            for (int i = 10; i <= 100; i+=10){
-                numbers.add(String.valueOf(i));
-            }
-            for (Player p : Market.getMarket().getServer().getOnlinePlayers()){
-                players.add(p.getName());
-            }
+    private static final ArrayList<String> COMMANDS = new ArrayList<String>(){{
+        add("listings");
+        add("cancelall");
+        add("mail");
+        add("create");
+        add("send");
+        add("pricecheck");
+        add("mailbox");
+        add("stall");
+        add("history");
+        add("reload");}};
 
-            switch (strings[0]){
-                case "listings":
-                case "cancelall":
-                case "reload":
-                case "pricecheck":
-                default:
-                    return new ArrayList<>();
-                case "send":
-                case "mail":
-                    return players;
-                case "history":
-                case "create":
-                    return numbers;
-                case "mailbox":
-                case "stall":
-                    return new ArrayList<String>(){{ add("remove"); }};
-            }
+    private static final ArrayList<String> REMOVE = new ArrayList<String>(){{
+        add("remove");}};
+
+    private static final ArrayList<String> NUMBERS = new ArrayList<String>(){{
+        for(int i = 1; i <=1000; i++) {
+            add(String.valueOf(i));
+        }
+    }};
+
+    private static final ArrayList<String> PLAYERS = new ArrayList<String>(){{
+        for(Player p : Market.getMarket().getServer().getOnlinePlayers()) {
+            add(p.getName());
+        }
+    }};
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        final List<String> completions = new ArrayList<>();
+        if(args.length > 1 && (args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("history"))) {
+            StringUtil.copyPartialMatches(args[0], NUMBERS, completions);
+            Collections.sort(completions);
+            return completions;
+        } else if (args.length > 1 && (args[0].equalsIgnoreCase("mail") || args[0].equalsIgnoreCase("send"))) {
+            StringUtil.copyPartialMatches(args[0], PLAYERS, completions);
+            Collections.sort(completions);
+            return completions;
+        } else if (args.length > 1 && (args[0].equalsIgnoreCase("mailbox") || args[0].equalsIgnoreCase("stall"))) {
+            StringUtil.copyPartialMatches(args[0], REMOVE, completions);
+            Collections.sort(completions);
+            return completions;
+        } else {
+            StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
+            Collections.sort(completions);
+            return completions;
         }
     }
 }
