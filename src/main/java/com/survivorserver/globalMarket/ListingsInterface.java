@@ -118,7 +118,7 @@ public class ListingsInterface extends IMenu {
             }
         });
 
-        /*addFunctionButton(47, new IFunctionButton("Search", null, Material.MAP) {
+        addFunctionButton(47, new IFunctionButton("Search", null, Material.MAP) {
             @Override
             public void onClick(final Player player, final InterfaceHandler handler, final InterfaceViewer viewer, final int slot, final InventoryClickEvent event) {
                 if(viewer.getSearch() == null) {
@@ -147,7 +147,7 @@ public class ListingsInterface extends IMenu {
             public boolean showButton(final InterfaceHandler handler, final InterfaceViewer viewer, final boolean hasPrevPage, final boolean hasNextPage) {
                 return true;
             }
-        });*/
+        });
     }
     
     private static void create(final Player player, final ItemStack item, final InterfaceViewer viewer) {
