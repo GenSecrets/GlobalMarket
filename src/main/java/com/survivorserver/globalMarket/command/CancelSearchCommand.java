@@ -11,41 +11,22 @@ import com.survivorserver.globalMarket.Market;
 import com.survivorserver.globalMarket.lib.SearchResult;
 import com.survivorserver.globalMarket.lib.SortMethod;
 
-public class CancelSearchCommand extends SubCommand {
+public class CancelSearchCommand {
+    private final Market market;
+    private final LocaleHandler locale;
 
     public CancelSearchCommand(Market market, LocaleHandler locale) {
-        super(market, locale);
+        this.market = market;
+        this.locale = locale;
     }
 
-    @Override
-    public String getCommand() {
-        return "cancelsearch";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[] {"cancelall"};
-    }
-
-    @Override
-    public String getPermissionNode() {
-        return "globalmarket.admin";
-    }
-
-    @Override
     public String getHelp() {
         return locale.get("cmd.prefix") + locale.get("cmd.cs_syntax") + " " + locale.get("cmd.cs_descr");
     }
 
-    @Override
-    public boolean allowConsoleSender() {
-        return true;
-    }
-
-    @Override
     public boolean onCommand(CommandSender sender, String[] args) {
-        if (args.length == 2) {
-            String search = args[1];
+        if (args.length == 1) {
+            String search = args[0];
             if (search.equalsIgnoreCase("all")) {
                 List<Listing> listings = market.getStorage().getAllListings();
                 if (listings.size() > 0) {
@@ -57,14 +38,14 @@ public class CancelSearchCommand extends SubCommand {
                     sender.sendMessage(ChatColor.YELLOW + "There are no listings to cancel");
                 }
             } else {
-                SearchResult res = market.getStorage().getListings(sender.getName(), SortMethod.DEFAULT, args[1], "");
+                SearchResult res = market.getStorage().getListings(sender.getName(), SortMethod.DEFAULT, args[0], "");
                 if (res.getTotalFound() > 0) {
                     for (Listing listing : res.getPage()) {
                         market.getCore().expireListing(listing);
                     }
                     sender.sendMessage(ChatColor.GREEN + "" + res.getTotalFound() + " listings cancelled");
                 } else {
-                    sender.sendMessage(ChatColor.YELLOW + "No results found for \"" + args[1] + "\"");
+                    sender.sendMessage(ChatColor.YELLOW + "No results found for \"" + args[0] + "\"");
                 }
             }
         } else {
